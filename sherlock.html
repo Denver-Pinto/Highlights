@@ -7,7 +7,9 @@ color:blue;
 margin-bottom : 5 px;
 }
 .select {
+    position:relative; 
 background-color: yellow;
+width:auto;
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -21,10 +23,43 @@ background-color: yellow;
 		
     });
 
+window
+$(window).scroll(function(){
+    
+    $(".select").css("position",'sticky');
+    $(".select").css("top",0);
+
+    if($(".select").length>1){
+        $(".select").first().css("position","static");
+    }
+
+/*
+    //check iof the parent div is visible or not
+    var top_of_element = $(".select").parent().position.top;
+    var bottom_of_element = $(".select").parent().position.top + $(".select").parent().outerHeight;
+    var bottom_of_screen = $(window).scrollTop() + window.innerHeight;
+    var top_of_screen = $(window).scrollTop();
+
+    if ((bottom_of_screen > top_of_element) && (top_of_screen < bottom_of_element)){
+        // the element is visible, do something
+        
+    $(".select").css("position",'sticky');
+    $(".select").css("top",0);
+
+    } else {
+        // the element is not visible, do something else
+    
+    $(".select").css("position",'static');
+    $(".select").css("top",0);
+    }
+    */
+});
+
+
     function getSelectedText() {
         if (window.getSelection) {
 			let element = document.createElement("span");
-			element.setAttribute('class','select');
+			element.setAttribute('class','select'); 
             window.getSelection().getRangeAt(0).surroundContents(element)
             return window.getSelection().toString();
 			
@@ -37,7 +72,7 @@ background-color: yellow;
 </script>
 <body class="everything">
 
-<h2><div class="title">Moments its musical age explain.</div></h2> But extremity sex now education concluded earnestly her continual. Oh furniture acuteness suspected continual ye something frankness. Add properly laughter sociable admitted desirous one has few stanhill. Opinion regular in perhaps another enjoyed no engaged he at. It conveying he continual ye suspected as necessary. Separate met packages shy for kindness. 
+<h2><div class="title" id="part1">Moments its musical age explain.</div></h2> But extremity sex now education concluded earnestly her continual. Oh furniture acuteness suspected continual ye something frankness. Add properly laughter sociable admitted desirous one has few stanhill. Opinion regular in perhaps another enjoyed no engaged he at. It conveying he continual ye suspected as necessary. Separate met packages shy for kindness. 
 
 Compliment interested discretion estimating on stimulated apartments oh. Dear so sing when in find read of call. As distrusts behaviour abilities defective is. Never at water me might. On formed merits hunted unable merely by mr whence or. Possession the unpleasing simplicity her uncommonly. 
 
