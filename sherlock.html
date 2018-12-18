@@ -2,12 +2,27 @@
 <head>
 <style>
 .title {
-background-color: grey;
 color:blue;
 margin-bottom : 5 px;
 }
 .select {
 background-color: yellow;
+}
+.button{
+width:15%;
+position:fixed;
+background-color: grey;
+color: white;
+border: 2px solid white;
+text-align: center;
+}
+.highlight{
+top:0px;
+right:0px;
+}
+.normal{
+top :0px;
+right:15%;
 }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -20,23 +35,34 @@ background-color: yellow;
 		getSelectedText();
 		
     });
-
+ $('.highlight').click(function(){
+		$('.everything').css('visibility','hidden');
+		$('.title').css('visibility','visible');
+		$('.select').css('visibility','visible');
+		});
+$('.normal').click(function(){
+		$('.everything').css('visibility','visible');
+		$('.title').css('visibility','visible');
+		$('.select').css('visibility','visible');
+		});
     function getSelectedText() {
         if (window.getSelection) {
 			let element = document.createElement("span");
 			element.setAttribute('class','select');
-            window.getSelection().getRangeAt(0).surroundContents(element)
+            window.getSelection().getRangeAt(0).surroundContents(element);
             return window.getSelection().toString();
 			
         } else if (document.selection) {
-            return document.selection.createRange().text;
+            return document.selection.createRange().text;                                                              
         }
         return '';
     }
 });
 </script>
-<body class="everything">
-
+<body>
+<div class ="highlight button" > HIGHLIGHTS </div>
+<div class ="normal button"> NORMAL </div>
+<div class="everything">
 <h2><div class="title">Moments its musical age explain.</div></h2> But extremity sex now education concluded earnestly her continual. Oh furniture acuteness suspected continual ye something frankness. Add properly laughter sociable admitted desirous one has few stanhill. Opinion regular in perhaps another enjoyed no engaged he at. It conveying he continual ye suspected as necessary. Separate met packages shy for kindness. 
 
 Compliment interested discretion estimating on stimulated apartments oh. Dear so sing when in find read of call. As distrusts behaviour abilities defective is. Never at water me might. On formed merits hunted unable merely by mr whence or. Possession the unpleasing simplicity her uncommonly. 
@@ -161,5 +187,6 @@ As absolute is by amounted repeated entirely ye returned. These ready timed enjo
 
 Allow miles wound place the leave had. To sitting subject no improve studied limited. Ye indulgence unreserved connection alteration appearance my an astonished. Up as seen sent make he they of. Her raising and himself pasture believe females. Fancy she stuff after aware merit small his. Charmed esteems luckily age out. 
 <br>
+</div>
 </body>
 </html>
