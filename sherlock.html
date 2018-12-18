@@ -47,9 +47,11 @@ $('.normal').click(function(){
 		});
     function getSelectedText() {
         if (window.getSelection) {
-			let element = document.createElement("span");
-			element.setAttribute('class','select');
-            window.getSelection().getRangeAt(0).surroundContents(element);
+		    if(!window.getSelection().isCollapsed){
+				let element = document.createElement("span");
+				element.setAttribute('class','select');
+				window.getSelection().getRangeAt(0).surroundContents(element);
+			}
             return window.getSelection().toString();
 			
         } else if (document.selection) {
