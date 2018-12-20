@@ -6,16 +6,53 @@ background-color: grey;
 color:blue;
 margin-bottom : 5 px;
 }
-.select {
-    position:relative; 
-background-color: yellow;
-width:auto;
+
+:root{
+    --default-padding:16px;
+    --header-height:80px;
 }
+
+.sticky {
+    position:sticky; 
+background-color: yellow;
+
+top: 0px;
+height: var(--header-height);
+padding: 0 var(--default-padding);
+
+
+}
+
+
+.sticky_sentinel {
+  position: absolute;
+  left: 0;
+  right: 0; /* needs dimensions */
+  visibility: hidden;
+}
+.sticky_sentinel--top {
+  /* Adjust the height and top values based on your on your sticky top position.
+  e.g. make the height bigger and adjust the top so observeHeaders()'s
+  IntersectionObserver fires as soon as the bottom of the sentinel crosses the
+  top of the intersection container. */
+  height: 40px;
+  top: -24px;
+}
+.sticky_sentinel--bottom {
+  /* Height should match the top of the header when it's at the bottom of the
+  intersection container. */
+  height: calc(var(--header-height) + var(--default-padding));
+  bottom: 0;
+}
+
+
+
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 </head>
 <script>
+
 	$(document).ready(function(){
  $('.everything').mouseup(function() {
         //alert(getSelectedText());
@@ -23,6 +60,9 @@ width:auto;
 		
     });
 
+});
+
+/*
 window
 $(window).scroll(function(){
     
@@ -33,6 +73,9 @@ $(window).scroll(function(){
         $(".select").first().css('position','relative');
         $(".select").first().css('top',0);
     }
+*/
+
+
 
 /*
     //check iof the parent div is visible or not
@@ -54,13 +97,11 @@ $(window).scroll(function(){
     $(".select").css("top",0);
     }
     */
-});
-
 
     function getSelectedText() {
         if (window.getSelection) {
 			let element = document.createElement("span");
-			element.setAttribute('class','select'); 
+			element.setAttribute('class','sticky'); 
             window.getSelection().getRangeAt(0).surroundContents(element)
             return window.getSelection().toString();
 			
@@ -69,11 +110,105 @@ $(window).scroll(function(){
         }
         return '';
     }
-});
+
+
+function observeStickyHeaderChanges(container) {
+  observeHeaders(container);
+  observeFooters(container);
+}
+
+observeStickyHeaderChanges(document.querySelector('#scroll-container'));
+
+
+/**
+ * Sets up an intersection observer to notify when elements with the class
+ * `.sticky_sentinel--top` become visible/invisible at the top of the container.
+ * @param {!Element} container
+ */
+ function observeHeaders(container) {
+  const observer = new IntersectionObserver((records, observer) => {
+    for (const record of records) {
+      const targetInfo = record.boundingClientRect;
+      const stickyTarget = record.target.parentElement.querySelector('.sticky');
+      const rootBoundsInfo = record.rootBounds;
+
+      // Started sticking.
+      if (targetInfo.bottom < rootBoundsInfo.top) {
+        fireEvent(true, stickyTarget);
+      }
+
+      // Stopped sticking.
+      if (targetInfo.bottom >= rootBoundsInfo.top &&
+          targetInfo.bottom < rootBoundsInfo.bottom) {
+       fireEvent(false, stickyTarget);
+      }
+    }
+  }, {threshold: [0], root: container});
+
+  // Add the top sentinels to each section and attach an observer.
+  const sentinels = addSentinels(container, 'sticky_sentinel--top');
+  if(sentinels!=null)
+  sentinels.forEach(el => observer.observe(el));
+}
+
+
+
+function observeFooters(container) {
+  const observer = new IntersectionObserver((records, observer) => {
+    for (const record of records) {
+      const targetInfo = record.boundingClientRect;
+      const stickyTarget = record.target.parentElement.querySelector('.sticky');
+      const rootBoundsInfo = record.rootBounds;
+      const ratio = record.intersectionRatio;
+
+      // Started sticking.
+      if (targetInfo.bottom > rootBoundsInfo.top && ratio === 1) {
+        fireEvent(true, stickyTarget);
+      }
+
+      // Stopped sticking.
+      if (targetInfo.top < rootBoundsInfo.top &&
+          targetInfo.bottom < rootBoundsInfo.bottom) {
+        fireEvent(false, stickyTarget);
+      }
+    }
+  }, {threshold: [1], root: container});
+
+  // Add the bottom sentinels to each section and attach an observer.
+  const sentinels = addSentinels(container, 'sticky_sentinel--bottom');
+  if(sentinels!=null)
+  sentinels.forEach(el => observer.observe(el));
+}
+
+
+/**
+ * @param {!Element} container
+ * @param {string} className
+ */
+ function addSentinels(container, className) {
+        if(container!=null){
+         return Array.from(container.querySelectorAll('.sticky')).map(el => {
+        const sentinel = document.createElement('div');
+        sentinel.classList.add('sticky_sentinel', className);
+        return el.parentElement.appendChild(sentinel);
+    });
+  }
+}
+
+/**
+ * Dispatches the `sticky-event` custom event on the target element.
+ * @param {boolean} stuck True if `target` is sticky.
+ * @param {!Element} target Element to fire the event on.
+ */
+function fireEvent(stuck, target) {
+  const e = new CustomEvent('sticky-change', {detail: {stuck, target}});
+  document.dispatchEvent(e);
+}
+
 </script>
 <body class="everything">
 
-<h2><div class="title" >Moments its musical age explain.</div></h2> But extremity sex now education concluded earnestly her continual. Oh furniture acuteness suspected continual ye something frankness. Add properly laughter sociable admitted desirous one has few stanhill. Opinion regular in perhaps another enjoyed no engaged he at. It conveying he continual ye suspected as necessary. Separate met packages shy for kindness. 
+<h2><div class="title" >Moments its musical age explain.</div></h2> <div>But extremity sex now education concluded earnestly her continual. Oh furniture acuteness suspected continual ye something frankness. Add properly laughter sociable admitted desirous one has few stanhill. Opinion regular in perhaps another enjoyed no engaged he at. It conveying he continual ye suspected as necessary. Separate met packages shy for kindness. 
 
 Compliment interested discretion estimating on stimulated apartments oh. Dear so sing when in find read of call. As distrusts behaviour abilities defective is. Never at water me might. On formed merits hunted unable merely by mr whence or. Possession the unpleasing simplicity her uncommonly. 
 
@@ -92,9 +227,9 @@ On then sake home is am leaf. Of suspicion do departure at extremely he believin
 In it except to so temper mutual tastes mother. Interested cultivated its continuing now yet are. Out interested acceptance our partiality affronting unpleasant why add. Esteem garden men yet shy course. Consulted up my tolerably sometimes perpetual oh. Expression acceptance imprudence particular had eat unsatiable. 
 
 Among going manor who did. Do ye is celebrated it sympathize considered. May ecstatic did surprise elegance the ignorant age. Own her miss cold last. It so numerous if he outlived disposal. How but sons mrs lady when. Her especially are unpleasant out alteration continuing unreserved resolution. Hence hopes noisy may china fully and. Am it regard stairs branch thirty length afford. 
-
+</div>
 <br>
-<h2><div class="title">He share of first to worse.</div></h2> Weddings and any opinions suitable smallest nay. My he houses or months settle remove ladies appear. Engrossed suffering supposing he recommend do eagerness. Commanded no of depending extremity recommend attention tolerably. Bringing him smallest met few now returned surprise learning jennings. Objection delivered eagerness he exquisite at do in. Warmly up he nearer mr merely me. 
+<h2><div class="title">He share of first to worse.</div></h2> <div>Weddings and any opinions suitable smallest nay. My he houses or months settle remove ladies appear. Engrossed suffering supposing he recommend do eagerness. Commanded no of depending extremity recommend attention tolerably. Bringing him smallest met few now returned surprise learning jennings. Objection delivered eagerness he exquisite at do in. Warmly up he nearer mr merely me. 
 
 Six started far placing saw respect females old. Civilly why how end viewing attempt related enquire visitor. Man particular insensible celebrated conviction stimulated principles day. Sure fail or in said west. Right my front it wound cause fully am sorry if. She jointure goodness interest debating did outweigh. Is time from them full my gone in went. Of no introduced am literature excellence mr stimulated contrasted increasing. Age sold some full like rich new. Amounted repeated as believed in confined juvenile. 
 
@@ -113,9 +248,9 @@ Doubtful two bed way pleasure confined followed. Shew up ye away no eyes life or
 Dissuade ecstatic and properly saw entirely sir why laughter endeavor. In on my jointure horrible margaret suitable he followed speedily. Indeed vanity excuse or mr lovers of on. By offer scale an stuff. Blush be sorry no sight. Sang lose of hour then he left find. 
 
 Same an quit most an. Admitting an mr disposing sportsmen. Tried on cause no spoil arise plate. Longer ladies valley get esteem use led six. Middletons resolution advantages expression themselves partiality so me at. West none hope if sing oh sent tell is. 
-
+</div>
 <br>
-<h2><div class="title">Ham followed now ecstatic </div></h2>use speaking exercise may repeated. Himself he evident oh greatly my on inhabit general concern. It earnest amongst he showing females so improve in picture. Mrs can hundred its greater account. Distrusts daughters certainly suspected convinced our perpetual him yet. Words did noise taken right state are since. 
+<h2><div class="title">Ham followed now ecstatic </div></h2><div>use speaking exercise may repeated. Himself he evident oh greatly my on inhabit general concern. It earnest amongst he showing females so improve in picture. Mrs can hundred its greater account. Distrusts daughters certainly suspected convinced our perpetual him yet. Words did noise taken right state are since. 
 
 Started several mistake joy say painful removed reached end. State burst think end are its. Arrived off she elderly beloved him affixed noisier yet. An course regard to up he hardly. View four has said does men saw find dear shy. Talent men wicket add garden. 
 
@@ -154,9 +289,9 @@ On then sake home is am leaf. Of suspicion do departure at extremely he believin
 In it except to so temper mutual tastes mother. Interested cultivated its continuing now yet are. Out interested acceptance our partiality affronting unpleasant why add. Esteem garden men yet shy course. Consulted up my tolerably sometimes perpetual oh. Expression acceptance imprudence particular had eat unsatiable. 
 
 Among going manor who did. Do ye is celebrated it sympathize considered. May ecstatic did surprise elegance the ignorant age. Own her miss cold last. It so numerous if he outlived disposal. How but sons mrs lady when. Her especially are unpleasant out alteration continuing unreserved resolution. Hence hopes noisy may china fully and. Am it regard stairs branch thirty length afford. 
-
+</div>
 <br>
-<h2><div class="title">He share of first to worse.</div></h2> Weddings and any opinions suitable smallest nay. My he houses or months settle remove ladies appear. Engrossed suffering supposing he recommend do eagerness. Commanded no of depending extremity recommend attention tolerably. Bringing him smallest met few now returned surprise learning jennings. Objection delivered eagerness he exquisite at do in. Warmly up he nearer mr merely me. 
+<h2><div class="title">He share of first to worse.</div></h2> <div>Weddings and any opinions suitable smallest nay. My he houses or months settle remove ladies appear. Engrossed suffering supposing he recommend do eagerness. Commanded no of depending extremity recommend attention tolerably. Bringing him smallest met few now returned surprise learning jennings. Objection delivered eagerness he exquisite at do in. Warmly up he nearer mr merely me. 
 
 Six started far placing saw respect females old. Civilly why how end viewing attempt related enquire visitor. Man particular insensible celebrated conviction stimulated principles day. Sure fail or in said west. Right my front it wound cause fully am sorry if. She jointure goodness interest debating did outweigh. Is time from them full my gone in went. Of no introduced am literature excellence mr stimulated contrasted increasing. Age sold some full like rich new. Amounted repeated as believed in confined juvenile. 
 
@@ -175,9 +310,9 @@ Doubtful two bed way pleasure confined followed. Shew up ye away no eyes life or
 Dissuade ecstatic and properly saw entirely sir why laughter endeavor. In on my jointure horrible margaret suitable he followed speedily. Indeed vanity excuse or mr lovers of on. By offer scale an stuff. Blush be sorry no sight. Sang lose of hour then he left find. 
 
 Same an quit most an. Admitting an mr disposing sportsmen. Tried on cause no spoil arise plate. Longer ladies valley get esteem use led six. Middletons resolution advantages expression themselves partiality so me at. West none hope if sing oh sent tell is. 
-
+</div>
 <br>
-<h2><div class="title">Ham followed now ecstatic</div></h2> use speaking exercise may repeated. Himself he evident oh greatly my on inhabit general concern. It earnest amongst he showing females so improve in picture. Mrs can hundred its greater account. Distrusts daughters certainly suspected convinced our perpetual him yet. Words did noise taken right state are since. 
+<h2><div class="title">Ham followed now ecstatic</div></h2><div> use speaking exercise may repeated. Himself he evident oh greatly my on inhabit general concern. It earnest amongst he showing females so improve in picture. Mrs can hundred its greater account. Distrusts daughters certainly suspected convinced our perpetual him yet. Words did noise taken right state are since. 
 
 Started several mistake joy say painful removed reached end. State burst think end are its. Arrived off she elderly beloved him affixed noisier yet. An course regard to up he hardly. View four has said does men saw find dear shy. Talent men wicket add garden. 
 
@@ -196,6 +331,6 @@ Up branch to easily missed by do. Admiration considered acceptance too led one m
 As absolute is by amounted repeated entirely ye returned. These ready timed enjoy might sir yet one since. Years drift never if could forty being no. On estimable dependent as suffering on my. Rank it long have sure in room what as he. Possession travelling sufficient yet our. Talked vanity looked in to. Gay perceive led believed endeavor. Rapturous no of estimable oh therefore direction up. Sons the ever not fine like eyes all sure. 
 
 Allow miles wound place the leave had. To sitting subject no improve studied limited. Ye indulgence unreserved connection alteration appearance my an astonished. Up as seen sent make he they of. Her raising and himself pasture believe females. Fancy she stuff after aware merit small his. Charmed esteems luckily age out. 
-<br>
+</div><br>
 </body>
 </html>
