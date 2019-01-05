@@ -212,7 +212,7 @@ function observeFooters(container) {
     records.forEach((record) => {
       const { boundingClientRect, rootBounds } = record;
       const stickyTarget = record.target.parentElement.querySelector(STICKY_SELECTOR);
-
+if(stickyTarget!=null){
       if (boundingClientRect.top < rootBounds.top && boundingClientRect.bottom < rootBounds.bottom) {
         fire(false, stickyTarget);
 
@@ -224,6 +224,7 @@ function observeFooters(container) {
         fire(true, stickyTarget);
         //parent bottom is above my top, and i'm already sticky
       }
+}
     });
   }, Object.assign({
     threshold: [1],
@@ -355,7 +356,10 @@ function getSentinelPosition(stickyElement, sentinel, className) {
  */
 
 function isSticking(stickyElement) {
+  if(stickyElement!=null){
   const topSentinel = stickyElement.previousElementSibling;
+
+  
 
   const stickyOffset = stickyElement.getBoundingClientRect().top;
   const topSentinelOffset = topSentinel.getBoundingClientRect().top;
@@ -364,7 +368,9 @@ function isSticking(stickyElement) {
   const topSentinelTopPosition = Math.abs(parseInt(window.getComputedStyle(topSentinel).getPropertyValue('top')));
 //checking difference between top of the child and its parent and if same,
 //we are saying true, else, false
-  return difference !== topSentinelTopPosition;
+  return difference !== topSentinelTopPosition;}
+  else
+  return false;
 }
 
 
